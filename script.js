@@ -2,7 +2,7 @@ const display = document.getElementById('display');
 const buttons = document.querySelectorAll('[id*=tecla]');
 const operators = document.querySelectorAll('[id*=operador]');
 const decimalBtn = document.querySelectorAll('[id*=decimal]');
-
+let caracterDecimal = ",";
 
 let newNumber = true;//verifica se é o primeiro número digitado
 let operator; // guarda a operação 
@@ -12,6 +12,8 @@ let previousNumber;//número anterior
  * @param {numero digital} numero 
  */
 function updateDisplay(numero) {
+    
+    let resultado = 0;
     if(newNumber) {
         if(numero == 0){
             numero = "0,";
@@ -42,6 +44,7 @@ function mudaCaracterDecimal(event) {
 const insertDecimal = (event) => {
     if (event.button == 1 || event.buttons == 4) {
         event.target.textContent == ","?event.target.textContent =".":event.target.textContent =",";
+        caracterDecimal = event.target.textContent;
         mudaCaracterDecimal(event);
     }else{
         let decimal = event.target.textContent;
@@ -83,9 +86,16 @@ operators.forEach((operator) => operator.addEventListener('click', selectOperato
 const calculate = () => {
     if(display.textContent.trim().length > 0){
         const actualNumber = display.textContent;
+        //pega a qanidade de casas decimais do numero atual
+        let casasDecimaisAct = calculaCasasDecimais(actualNumber);
+        //pega a qanidade de casas decimais do nmero anterior
+        let casasDecimaisPrev = calculaCasasDecimais(actualNumber);
+        //verifica as casas decimais que tem mais digitos
+        let qtdCasasDecimais = casasDecimaisAct > casasDecimaisPrev?casasDecimaisAct:casasDecimaisPrev;
         let act = parseFloat(new String(actualNumber).replace(",","."));
         let prev =  parseFloat(new String(previousNumber).replace(",","."));
-        const result = eval(`prev${operator}act`); //template string, utilizando craze
+        let result = eval(`prev${operator}act`); //template string, utilizando craze
+        result = round(result,qtdCasasDecimais);
         newNumber = true;
         updateDisplay(new String(result).replace(".",","));
     }
@@ -120,3 +130,25 @@ const invertSignal = () => {
 }
 //pega o selector '+-' e adicionar o evento click 
 document.querySelector("#inverter").addEventListener("click", invertSignal);
+/**
+ * Arredando as casas decimais
+ * @param {*} num 
+ * @param {*} places 
+ * @returns 
+ */
+const round = (num, places) => {
+	if (!("" + num).includes("e")) {
+		return +(Math.round(num + "e+" + places)  + "e-" + places);
+	} else {
+		let arr = ("" + num).split("e");
+		let sig = ""
+		if (+arr[1] + places > 0) {
+			sig = "+";
+		}
+
+		return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + places)) + "e-" + places);
+	}
+}
+let calculaCasasDecimais = (num) =>{
+    return (num.length - num.indexOf(caracterDecimal));
+}
