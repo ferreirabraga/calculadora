@@ -1,7 +1,7 @@
 # calculadora
 Trabalho MBA FIAP Modern Web - Calculadora 
 
-Para doar pastar clona o código e abrir o arquivo em qualquer navegador.
+Para executar o codigo basta clonar e abrir o arquivo index.hmtl em qualquer navegador.
 
 Melhorias:
 
